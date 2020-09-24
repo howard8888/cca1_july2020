@@ -32,7 +32,7 @@ overview:
 
 if __name__ == '__main__': main_eval():  while loop:
     main_mech.cycles(True)  #if nano siml'n chosen
-    print_conscious_memory(sim_choice)
+    print_event_log_memory(sim_choice)
     if not run_again(): break loop and end
     -->else loops again for new mission --^
 
@@ -60,9 +60,12 @@ requirements.txt:
     cca1_2020.py
     ddata.py
     gdata.py
+    navmod.py
     constants.py
     main_mech.py
     pypi.org: fuzzywuzzy
+    optional: pypi.org: python-levenshtein
+    optional: visual c++
     pypi.org: numpy
 '''
 
@@ -127,7 +130,7 @@ except ImportError:
 # these will be used by cca1.py module via instantiation ('g') in main_eval()
 # of 'MultipleSessionsData'  (also some global constants copied to g as well)
 #include here variables which will persist between missions:
-# performance_metric, conscious_memory
+# performance_metric, event_log_memory
 #most other data variables are initiated at start of each mission (ie, each
 # time main_mech.cycles() is called via instantiation ('d') of MapData
 ##END GLOBAL & SYST VARIABLES
@@ -151,10 +154,10 @@ def choose_simulation(g: gdata.MultipleSessionsData)-> str:
            instantiated in main_eval() when program starts
     returns:
         value corresponding to simulation version chosen
-        default return value is "july2000"
+        default return value is "july2020"
 
     '''
-    default_ret_value = "july2000"
+    default_ret_value = "july2020"
     printline = """
     \nCCA1  Causal Cognitive Architecture 1\n
     Welcome to the CCA1 Simulator\n
@@ -180,7 +183,7 @@ def choose_simulation(g: gdata.MultipleSessionsData)-> str:
     choices = {
         0: ('\nNot defined - n/a -- 2020 rewrite version will run\n', default_ret_value),
         1: ('\n"nano" version D or H - n/a -- 2020 rewrite version will run\n', default_ret_value),
-        2: ('\n"nano" standard G version - n/a -- 2020 rewrite version will run\n', "july2000"),
+        2: ('\n"nano" standard G version - n/a -- 2020 rewrite version will run\n', "july2020"),
         3: ('\n"nano" version D or H  - n/a -- 2020 rewrite version will run\n', default_ret_value),
         4: ('\n"micro" version selected\n', "micro"),
         5: ('\n"milli" version selected\n', "milli"),
@@ -227,24 +230,24 @@ def run_again()-> bool:
     return True
 
 
-def print_conscious_memory(g: gdata.MultipleSessionsData, sim_choice: str)-> bool:
-    '''print out raw conscious memory for now
+def print_event_log_memory(g: gdata.MultipleSessionsData, sim_choice: str)-> bool:
+    '''print out raw event_log memory for now
     add more functionality in future versions via
     other methods inside the appropriate module
     '''
-    if sim_choice == "july2000":
-        if input('Print out raw conscious memory?') in ('Y', 'y', 'Yes', 'yes'):
-            g.printout_conscious_memory()
+    if sim_choice == "july2020":
+        if input('Print out raw event_log memory?') in ('Y', 'y', 'Yes', 'yes'):
+            g.printout_event_log_memory()
         return True
     if sim_choice == "micro":
-        if input('Print out raw conscious memory?') in ('Y', 'y', 'Yes', 'yes'):
-            g.printout_conscious_memory()# type: ignore
+        if input('Print out raw event_log memory?') in ('Y', 'y', 'Yes', 'yes'):
+            g.printout_event_log_memory()# type: ignore
         return True
     if sim_choice == "milli":
-        if input('Print out raw conscious memory?') in ('Y', 'y', 'Yes', 'yes'):
-            g.printout_conscious_memory()# type: ignore
+        if input('Print out raw event_log memory?') in ('Y', 'y', 'Yes', 'yes'):
+            g.printout_event_log_memory()# type: ignore
         return True
-    print("\ndebug: main_eval() called print_conscious_memory(sim_choice) but")
+    print("\ndebug: main_eval() called print_event_log_memory(sim_choice) but")
     input("       sim_choice is not recognized....press any key to continue....")
     return False
 
@@ -294,12 +297,13 @@ def main_eval()-> None:
     this method will generally call a particular version of one
      the nano, micro, milli or full simulation's evaluation cycles
      (which runs until the mission (==simulation) is completed)
+    nb. July2020 version deprecates above into more streamlined control code
     after mission complete, control returns here and can decide if
       want to run another mission or exit from this main loop
 
     if __name__ == '__main__': main_eval():  while loop:
-        main_mech.cycles(True)  #if "july 2020" siml'n chosen
-        print_conscious_memory(sim_choice)
+        main_mech.cycles(True)
+        print_event_log_memory(sim_choice)
         if not run_again(): break loop and end
         -->else loops again for new mission --^
 
@@ -310,17 +314,17 @@ def main_eval()-> None:
 
     #run mission, repeat mission again or exit
     while True:
-        #current_valid_choices = ("july2000", "micro", "milli", "full2018", "2018")
+        #current_valid_choices = ("july2020", "micro", "milli", "full2018", "2018")
         sim_choice = choose_simulation(g)
         if sim_choice in ("full2018", "2018"):
-            sim_choice = "july2000"
-            print('\nnb. at this point in deprecation/rewrite full simulations--> july2000\n')
+            sim_choice = "july2020"
+            print('\nnb. at this point in deprecation/rewrite full simulations--> july2020\n')
 
-        elif sim_choice == "july2000":
+        elif sim_choice == "july2020":
             #try:
             if not main_mech.cycles(g, True):  #  type: ignore
                 print('\nDebug note: returned unsuccessfully from main_mech()\n')
-            print_conscious_memory(g, sim_choice)
+            print_event_log_memory(g, sim_choice)
             if not run_again():
                 break
             #except:
@@ -330,7 +334,7 @@ def main_eval()-> None:
         elif sim_choice == "micro":
             try:
                 eval_micro.evaluation_cycles_micro1(g, True)  # type: ignore
-                print_conscious_memory(g, sim_choice)
+                print_event_log_memory(g, sim_choice)
                 if not run_again():
                     break
             except NameError:
@@ -340,7 +344,7 @@ def main_eval()-> None:
         elif sim_choice == "milli":
             try:
                 eval_milli.evaluation_cycles_milli1(g, True)  # type: ignore
-                print_conscious_memory(g, sim_choice)
+                print_event_log_memory(g, sim_choice)
                 if not run_again():
                     break
             except NameError:
